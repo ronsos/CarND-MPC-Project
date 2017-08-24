@@ -6,8 +6,8 @@
 using CppAD::AD;
 
 // TODO: Set the timestep length and duration
-size_t N = 0;
-double dt = 0;
+size_t N = 50;
+double dt = 0.1;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -117,5 +117,8 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   //
   // {...} is shorthand for creating a vector, so auto x1 = {1.0,2.0}
   // creates a 2 element double vector.
-  return {};
+  
+  // TODO Verify this is the steering command and throttle command  
+  return {solution.x[0], solution.x[1]};
+ 
 }
