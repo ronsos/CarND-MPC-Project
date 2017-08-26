@@ -95,26 +95,37 @@ int main() {
           // Transform position state from map coords to car coords
           // First, initialize variables  
           Eigen::VectorXd ptsx_car(ptsx.size()),ptsy_car(ptsx.size());
-          double x, y;
+          double x, y; //xcar, ycar;
             
           // Loop through position vector and perform coordinate transform  
           for (int i=0; i<ptsx.size(); i++){
             x = ptsx[i] - px;
             y = ptsy[i] - py;
             ptsx_car[i] = x * cos(-psi) - y * sin(-psi);
-            ptsy_car[i] = x * sin(-psi) + y * cos(-psi);  
-          }   
+            ptsy_car[i] = x * sin(-psi) + y * cos(-psi);
+            ptsy_car[i] = 0.0;  
+            //std::cout << "ptsX_car: " << ptsx_car[i] << "; ptsY_car: " << ptsy_car[i] << std::endl;
+            
+          } 
 
           // fit a polynomial to the above x and y coordinates
           auto coeffs = polyfit(ptsx_car, ptsy_car, 1);
+          std::cout << "coeffs = " << coeffs << std::endl;           
 
           // Calculate the cross track error
-          double cte = polyeval(coeffs, x) - y; 
+          //double cte = polyeval(coeffs, px) - py; 
+          double cte = polyeval(coeffs, 0) - 0; 
+          //std::cout << "cte = " << cte << std::endl;
+              
           // Calculate the orientation error
-          double epsi = psi - atan(coeffs[1]);
+          // TODO Fix this!!!  
+          //double epsi = psi - atan(coeffs[1]);
+          double epsi = 0.0;
 
           Eigen::VectorXd state(6);
-          state << x, y, psi, v, cte, epsi;
+          
+          // State in car frame
+          state << 0, 0, psi, v, cte, epsi;
 
           std::vector<double> x_vals = {state[0]};
           std::vector<double> y_vals = {state[1]};
