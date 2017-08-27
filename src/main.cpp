@@ -119,11 +119,12 @@ int main() {
           // Calculate the cross track error
           //double cte = polyeval(coeffs, px) - py; 
           double cte = polyeval(coeffs, 0) - 0; 
-          //std::cout << "cte = " << cte << std::endl;
+          std::cout << "cte = " << cte << std::endl;
               
           // Calculate the orientation error
           double epsi = -atan(coeffs[1]);
-
+          std::cout << "epsi = " << epsi << std::endl;
+          
           Eigen::VectorXd state(6);
           
           // State in car frame
@@ -139,7 +140,7 @@ int main() {
           std::vector<double> a_vals = {};
 
           // Set number of iterations
-          int iters = 7; // 50  
+          int iters = 5; // 50  
           
           for (size_t i = 0; i < iters; i++) {
             std::cout << "Iteration " << i << std::endl;
@@ -171,7 +172,7 @@ int main() {
           // Both are in between [-1, 1].
           //steer_value = delta_vals.back() / deg2rad(25) / Lf;
           steer_value = -delta_vals[0] / deg2rad(25) / Lf;
-          throttle_value = a_vals.back();
+          throttle_value = a_vals[0];
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
