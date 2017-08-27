@@ -139,7 +139,7 @@ int main() {
           std::vector<double> a_vals = {};
 
           // Set number of iterations
-          int iters = 3; // 50  
+          int iters = 7; // 50  
           
           for (size_t i = 0; i < iters; i++) {
             std::cout << "Iteration " << i << std::endl;
@@ -156,7 +156,7 @@ int main() {
             a_vals.push_back(vars[7]);
 
             state << vars[0], vars[1], vars[2], vars[3], vars[4], vars[5];
-            std::cout << "x = " << vars[0] << std::endl;
+            /*std::cout << "x = " << vars[0] << std::endl;
             std::cout << "y = " << vars[1] << std::endl;
             std::cout << "psi = " << vars[2] << std::endl;
             std::cout << "v = " << vars[3] << std::endl;
@@ -164,12 +164,13 @@ int main() {
             std::cout << "epsi = " << vars[5] << std::endl;
             std::cout << "delta = " << vars[6] << std::endl;
             std::cout << "a = " << vars[7] << std::endl;
-            std::cout << std::endl;
+            std::cout << std::endl;*/
           }
    
           // Calculate steering angle and throttle using MPC.
           // Both are in between [-1, 1].
-          steer_value = -delta_vals.back() / deg2rad(25) / Lf;
+          //steer_value = delta_vals.back() / deg2rad(25) / Lf;
+          steer_value = -delta_vals[0] / deg2rad(25) / Lf;
           throttle_value = a_vals.back();
 
           json msgJson;
