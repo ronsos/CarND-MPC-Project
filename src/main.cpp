@@ -96,14 +96,6 @@ int main() {
           double delta = j[1]["steering_angle"];
           double accel = j[1]["throttle"];
             
-          // Display current state  
-          /*std::cout << "px " << px << std::endl;
-          std::cout << "py " << py << std::endl;
-          std::cout << "psi " << psi << std::endl;
-          std::cout << "v " << v << std::endl;
-          std::cout << "delta " << delta << std::endl;
-          std::cout << "accel " << accel << std::endl;*/
-            
           // Add in latency
           double latency = 0.100; // ms
           double v_ms = v * 5280 * .3048 / 3600; // convert velocity to m/s 
@@ -111,14 +103,7 @@ int main() {
           py = py + v_ms*sin(psi)*latency;
           psi = psi + v_ms*delta/Lf*latency; 
           v = v + accel*latency;
-            
-          // Display current state  
-          /*std::cout << "px " << px << std::endl;
-          std::cout << "py " << py << std::endl;
-          std::cout << "psi " << psi << std::endl;
-          std::cout << "v " << v << std::endl;*/
-
-            
+     
           // Transform position state from map coords to car coords
           // First, initialize variables  
           Eigen::VectorXd ptsx_car(ptsx.size()),ptsy_car(ptsx.size());
@@ -160,7 +145,7 @@ int main() {
           int iters = 5; // 50  
           
           for (size_t i = 0; i < iters; i++) {
-            std::cout << "Iteration " << i << std::endl;
+            //std::cout << "Iteration " << i << std::endl;
 
             auto vars = mpc.Solve(state, coeffs);
 
@@ -174,15 +159,7 @@ int main() {
             a_vals.push_back(vars[7]);
 
             state << vars[0], vars[1], vars[2], vars[3], vars[4], vars[5];
-            /*std::cout << "x = " << vars[0] << std::endl;
-            std::cout << "y = " << vars[1] << std::endl;
-            std::cout << "psi = " << vars[2] << std::endl;
-            std::cout << "v = " << vars[3] << std::endl;
-            std::cout << "cte = " << vars[4] << std::endl;
-            std::cout << "epsi = " << vars[5] << std::endl;
-            std::cout << "delta = " << vars[6] << std::endl;
-            std::cout << "a = " << vars[7] << std::endl;
-            std::cout << std::endl;*/
+            
           }
    
           json msgJson;

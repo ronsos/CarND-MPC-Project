@@ -55,9 +55,6 @@ class FG_eval {
     fg[0] = 0;
 
     // Reference State Cost
-    // TODO: Define the cost related the reference state and
-    // any anything you think may be beneficial.
-
     // The part of the cost based on the reference state.  
     for (int t = 0; t < N; t++) {
         fg[0] += CppAD::pow(vars[cte_start + t], 2);
@@ -258,7 +255,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
 
   // Cost
   auto cost = solution.obj_value;
-  std::cout << "Cost " << cost << std::endl;
+  //std::cout << "Cost " << cost << std::endl;
 
   // TODO: Return the first actuator values. The variables can be accessed with
   // `solution.x[i]`.
