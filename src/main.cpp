@@ -6,8 +6,10 @@
 #include <vector>
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
-#include "MPC.h"
+#include "MPC.h"   
 #include "json.hpp"
+    
+const double Lf = 2.67;
 
 // for convenience
 using json = nlohmann::json;
@@ -91,6 +93,8 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
+          double steer_value = j[1]["steering_angle"];
+          double throttle_value = j[1]["throttle"];
             
           // Transform position state from map coords to car coords
           // First, initialize variables  
@@ -103,14 +107,14 @@ int main() {
             y = ptsy[i] - py;
             ptsx_car[i] = x * cos(-psi) - y * sin(-psi);
             ptsy_car[i] = x * sin(-psi) + y * cos(-psi);
-            ptsy_car[i] = 0.0;  
+            //ptsy_car[i] = 0.0;  
             //std::cout << "ptsX_car: " << ptsx_car[i] << "; ptsY_car: " << ptsy_car[i] << std::endl;
             
           } 
 
           // fit a polynomial to the above x and y coordinates
-          auto coeffs = polyfit(ptsx_car, ptsy_car, 1);
-          std::cout << "coeffs = " << coeffs << std::endl;           
+          auto coeffs = polyfit(ptsx_car, ptsy_car, 3);
+          //std::cout << "coeffs = " << coeffs << std::endl;           
 
           // Calculate the cross track error
           //double cte = polyeval(coeffs, px) - py; 
@@ -118,14 +122,12 @@ int main() {
           //std::cout << "cte = " << cte << std::endl;
               
           // Calculate the orientation error
-          // TODO Fix this!!!  
-          //double epsi = psi - atan(coeffs[1]);
-          double epsi = 0.0;
+          double epsi = -atan(coeffs[1]);
 
           Eigen::VectorXd state(6);
           
           // State in car frame
-          state << 0, 0, psi, v, cte, epsi;
+          state << 0, 0, 0, v, cte, epsi;
 
           std::vector<double> x_vals = {state[0]};
           std::vector<double> y_vals = {state[1]};
@@ -137,7 +139,7 @@ int main() {
           std::vector<double> a_vals = {};
 
           // Set number of iterations
-          int iters = 7; // 50  
+          int iters = 3; // 50  
           
           for (size_t i = 0; i < iters; i++) {
             std::cout << "Iteration " << i << std::endl;
@@ -150,7 +152,6 @@ int main() {
             v_vals.push_back(vars[3]);
             cte_vals.push_back(vars[4]);
             epsi_vals.push_back(vars[5]);
-
             delta_vals.push_back(vars[6]);
             a_vals.push_back(vars[7]);
 
@@ -168,9 +169,8 @@ int main() {
    
           // Calculate steering angle and throttle using MPC.
           // Both are in between [-1, 1].
-        
-          double steer_value = -delta_vals[0] / deg2rad(25) ;
-          double throttle_value = a_vals[0];
+          steer_value = -delta_vals.back() / deg2rad(25) / Lf;
+          throttle_value = a_vals.back();
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
@@ -194,7 +194,6 @@ int main() {
 
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
-          // TEMP Commands TODO
           for (int i=0; i<ptsx.size(); i++){ 
               next_x_vals.push_back(ptsx_car[i]);
               next_y_vals.push_back(ptsy_car[i]);
@@ -215,7 +214,7 @@ int main() {
           //
           // NOTE: REMEMBER TO SET THIS TO 100 MILLISECONDS BEFORE
           // SUBMITTING.
-          this_thread::sleep_for(chrono::milliseconds(100));
+          this_thread::sleep_for(chrono::milliseconds(0)); // 100
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {
