@@ -93,8 +93,31 @@ int main() {
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
-          double steer_value = j[1]["steering_angle"];
-          double throttle_value = j[1]["throttle"];
+          double delta = j[1]["steering_angle"];
+          double accel = j[1]["throttle"];
+            
+          // Display current state  
+          /*std::cout << "px " << px << std::endl;
+          std::cout << "py " << py << std::endl;
+          std::cout << "psi " << psi << std::endl;
+          std::cout << "v " << v << std::endl;
+          std::cout << "delta " << delta << std::endl;
+          std::cout << "accel " << accel << std::endl;*/
+            
+          // Add in latency
+          double latency = 0.100; // ms
+          double v_ms = v * 5280 * .3048 / 3600; // convert velocity to m/s 
+          px = px + v_ms*cos(psi)*latency;
+          py = py + v_ms*sin(psi)*latency;
+          psi = psi + v_ms*delta/Lf*latency; 
+          v = v + accel*latency;
+            
+          // Display current state  
+          /*std::cout << "px " << px << std::endl;
+          std::cout << "py " << py << std::endl;
+          std::cout << "psi " << psi << std::endl;
+          std::cout << "v " << v << std::endl;*/
+
             
           // Transform position state from map coords to car coords
           // First, initialize variables  
@@ -106,25 +129,19 @@ int main() {
             x = ptsx[i] - px;
             y = ptsy[i] - py;
             ptsx_car[i] = x * cos(-psi) - y * sin(-psi);
-            ptsy_car[i] = x * sin(-psi) + y * cos(-psi);
-            //ptsy_car[i] = 0.0;  
-            //std::cout << "ptsX_car: " << ptsx_car[i] << "; ptsY_car: " << ptsy_car[i] << std::endl;
-            
+            ptsy_car[i] = x * sin(-psi) + y * cos(-psi); 
           } 
 
           // fit a polynomial to the above x and y coordinates
           auto coeffs = polyfit(ptsx_car, ptsy_car, 3);
-          //std::cout << "coeffs = " << coeffs << std::endl;           
-
+          
           // Calculate the cross track error
-          //double cte = polyeval(coeffs, px) - py; 
           double cte = polyeval(coeffs, 0) - 0; 
-          std::cout << "cte = " << cte << std::endl;
               
           // Calculate the orientation error
           double epsi = -atan(coeffs[1]);
-          std::cout << "epsi = " << epsi << std::endl;
           
+          // Initialize state vector
           Eigen::VectorXd state(6);
           
           // State in car frame
@@ -168,25 +185,15 @@ int main() {
             std::cout << std::endl;*/
           }
    
-          // Calculate steering angle and throttle using MPC.
-          // Both are in between [-1, 1].
-          //steer_value = delta_vals.back() / deg2rad(25) / Lf;
-          steer_value = -delta_vals[0] / deg2rad(25) / Lf;
-          throttle_value = a_vals[0];
-
           json msgJson;
-          // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
-          // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = throttle_value;
+            
+          // Send commands to simulator
+          msgJson["steering_angle"] = -delta_vals[0] / deg2rad(25) / Lf;
+          msgJson["throttle"] = a_vals[0];
 
-          //Display the MPC predicted trajectory 
+          //Display the MPC predicted trajectory (Green)
           vector<double> mpc_x_vals = x_vals;
           vector<double> mpc_y_vals = y_vals;
-
-          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
-          // the points in the simulator are connected by a Green line
-
           msgJson["mpc_x"] = mpc_x_vals;
           msgJson["mpc_y"] = mpc_y_vals;
 
@@ -194,7 +201,8 @@ int main() {
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
-          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
+          // add (x,y) points to list here
+          // points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
           for (int i=0; i<ptsx.size(); i++){ 
               next_x_vals.push_back(ptsx_car[i]);
@@ -216,7 +224,7 @@ int main() {
           //
           // NOTE: REMEMBER TO SET THIS TO 100 MILLISECONDS BEFORE
           // SUBMITTING.
-          this_thread::sleep_for(chrono::milliseconds(0)); // 100
+          this_thread::sleep_for(chrono::milliseconds(100)); 
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {
