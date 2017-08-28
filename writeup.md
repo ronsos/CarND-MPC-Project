@@ -40,6 +40,8 @@ These are used in the main set of dynamic equations. The dynamics equations are 
 `fg[1 + cte_start + t] = cte1 - (f0 - y0 + v0 * CppAD::sin(epsi0) * dt)`
 
 `fg[1 + epsi_start + t] = epsi1 - ((psi0-psides0) - v0/Lf * delta0 * dt)`
+
+The solution that is returned from the solver consists of two main parts: commands, and the predicted path. The commands are applied in terms of throttle value and steering command. The projected state from the MPC solver solution is put into the `mpc_x_vals` and `mpc_y_vals` arrays and plotted in the simulator in green. 
  
 
 ### Timestep Length and Elapsed Duration (N & dt)
@@ -49,9 +51,9 @@ The number of points, N, is the total amount of points used in the optimizer.
 
 Thus, the product of these parameters, `N*dt`, represents the total length of the propagation in time, or time horizon. The larger this number, the greater the length of time forward the optimizer is considering. 
 
-The total distance down the track the optimizer will consider is `N*dt*velocity`. The key in tuning the N and dt parameters is to consider far enough forward that the controller has time to response to sharp turns but not so far in the future that the curvefit will have to content with very complex geometry and potentially ugly overfitted solutions. Also, the computational limits need to be considered. For a given `N*dt`, increasing N or lowering dt will tend to require more computational effort. 
+The total distance down the track the optimizer will consider is `N*dt*velocity`. The key in tuning the N and dt parameters is to consider far enough forward that the controller has time to response to sharp turns but not so far in the future that the curvefit will have to content with very complex geometry and potentially ugly overfitted solutions. Also, the computational limits need to be considered. For a given `N*dt`, a combination of increasing N / lowering dt will tend to require more computational effort. 
 
-The final values that I chose were N=8 and dt=0.1. These values worked for velocities of 60 mph and 90 mph. This combination seemed to provide enough down track information that the car could achieve the turn rates necessary for sharp turns, but without excessive computations. 
+The final values that I chose were N=8 and dt=0.1. These values worked for a velocity of 80 mph. For 60 mph, I used N=10 and dt=0.1. These values seemed to provide enough down track information that the car could achieve the turn rates necessary for sharp turns, but without excessive computations. 
 
 The cost function required tuning for each velocity target as well. 
 
@@ -79,7 +81,7 @@ The velocity is then used to propagate the current state forward 0.1 s.
 
 `py = py + v_ms*sin(psi)*latency`
 
-`psi = psi + v_ms*delta/Lf*latency`
+`psi = psi + v_ms*(-delta)/Lf*latency`
 
 `v = v + accel*latency`
  
