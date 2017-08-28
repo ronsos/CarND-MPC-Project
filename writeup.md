@@ -25,7 +25,7 @@ The state gets passed into the MPC solver, where it is used to set the initial c
 
 `f0 = coeffs[0] + coeffs[1]*x0 + coeffs[2]*x0*x0 + coeffs[3]*x0*x0*x0`
 
-`psides0 = CppAD::atan(3*coeffs[3]*x0*x0 + 2*coeffs[2] + coeffs[1])`
+`psides0 = CppAD::atan(3*coeffs[3]*x0*x0 + 2*coeffs[2]*x0 + coeffs[1])`
 
 These are used in the main set of dynamic equations. The dynamics equations are treated as constraints that must be driven to zero. The dynamics/constraints model is as follows:
 

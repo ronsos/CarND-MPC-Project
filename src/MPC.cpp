@@ -11,7 +11,7 @@ using CppAD::AD;
 size_t N = 10; 
 double dt = 0.1; //0.15
 
-double ref_v = 30.0; // Reference velocity target
+double ref_v = 60.0; // Reference velocity target
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -57,21 +57,21 @@ class FG_eval {
     // Reference State Cost
     // The part of the cost based on the reference state.  
     for (int t = 0; t < N; t++) {
-        fg[0] += CppAD::pow(vars[cte_start + t], 2);
-        fg[0] += CppAD::pow(vars[epsi_start + t], 2);
+        fg[0] += 100*CppAD::pow(vars[cte_start + t], 2);
+        fg[0] += 100*CppAD::pow(vars[epsi_start + t], 2);
         fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
     
     // Minimize the use of actuators.
     for (int t = 0; t < N - 1; t++) {
-      fg[0] += CppAD::pow(vars[delta_start + t], 2);
-      fg[0] += 5*CppAD::pow(vars[a_start + t], 2);
+      fg[0] += 10*CppAD::pow(vars[delta_start + t], 2);
+      fg[0] += CppAD::pow(vars[a_start + t], 2);
     }
 
     // Minimize the value gap between sequential actuations.
     for (int t = 0; t < N - 2; t++) {
-      fg[0] += 200*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-      fg[0] += 500*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+      fg[0] += 100*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+      fg[0] += CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
       
     // Setup Constraints
@@ -110,7 +110,7 @@ class FG_eval {
       AD<double> a0 = vars[a_start + t - 1];  
         
       AD<double> f0 = coeffs[0] + coeffs[1]*x0 + coeffs[2]*x0*x0 + coeffs[3]*x0*x0*x0;
-      AD<double> psides0 = CppAD::atan(3*coeffs[3]*x0*x0 + 2*coeffs[2] + coeffs[1]);
+      AD<double> psides0 = CppAD::atan(3*coeffs[3]*x0*x0 + 2*coeffs[2]*x0 + coeffs[1]);
 
 
       // Here's `x` to get you started.
@@ -126,7 +126,7 @@ class FG_eval {
       fg[1 + psi_start + t] = psi1 - (psi0 + v0/Lf * delta0 * dt);
       fg[1 + v_start + t] = v1 - (v0 + a0 * dt);
       fg[1 + cte_start + t] = cte1 - (f0 - y0 + v0 * CppAD::sin(epsi0) * dt);
-      fg[1 + epsi_start + t] = epsi1 - ((psi0-psides0) - v0/Lf * delta0 * dt);
+      fg[1 + epsi_start + t] = epsi1 - ((psi0-psides0) + v0/Lf * delta0 * dt);
     }
   }
 };
