@@ -43,9 +43,17 @@ These are used in the main set of dynamic equations. The dynamics equations are 
  
 
 ### Timestep Length and Elapsed Duration (N & dt)
-The final values that I chose were N=10 and dt=0.1. Increasing dt or N seemed to create problems. The solution would tend to overfit for higher values, which led to steering commands that were offtrack. 
+The timestep, dt, represents the length of time between each point used in the discretization of the state propagation in the optimzer. 
 
-For lower combined values of N and dt the solver did not find a good solution. 
+The number of points, N, is the total amount of points used in the optimizer. 
+
+Thus, the product of these parameters, `N*dt`, represents the total length of the propagation in time, or time horizon. The larger this number, the greater the length of time forward the optimizer is considering. 
+
+The total distance down the track the optimizer will consider is `N*dt*velocity`. The key in tuning the N and dt parameters is to consider far enough forward that the controller has time to response to sharp turns but not so far in the future that the curvefit will have to content with very complex geometry and potentially ugly overfitted solutions.  
+
+The final values that I chose were N=10 and dt=0.1. These values worked for velocities of 60 mph and 90 mph. This combination seemed to provide enough down track information that the car could achieve the turn rates necessary for sharp turns, but without excessive manuevering on straight portions. 
+
+The cost function required tuning for each velocity target as well. 
 
 
 ### Polynomial Fitting and MPC Preprocessing
