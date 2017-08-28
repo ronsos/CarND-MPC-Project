@@ -8,7 +8,7 @@
 using CppAD::AD;
 
 // Set the timestep length and duration
-size_t N = 10; 
+size_t N = 8; // 10 
 double dt = 0.1; //0.15
 
 double ref_v = 90.0; // Reference velocity target
