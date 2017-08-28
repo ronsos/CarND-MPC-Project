@@ -6,8 +6,11 @@ A MPC controller is used for commanding the steering and throttle of the vehicle
 The output state from the simulator is given in map coordinates. I converted the position state from map (px, py) to car coordinates in main.cpp, according to the following equations:
 
 `x = ptsx[i] - px;
+
  y = ptsy[i] - py;
+ 
  ptsx_car[i] = x * cos(-psi) - y * sin(-psi);
+ 
  ptsy_car[i] = x * sin(-psi) + y * cos(-psi);`
  
 The polynomial curvefit is a 3rd order fit applied to the position state in car coordinates. This fit is then used to calculate the crosstrack error (cte) and the error in vehicle orientation.
