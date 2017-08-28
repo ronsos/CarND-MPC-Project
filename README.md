@@ -53,7 +53,7 @@ Thus, the product of these parameters, `N*dt`, represents the total length of th
 
 The total distance down the track the optimizer will consider is `N*dt*velocity`. The key in tuning the N and dt parameters is to consider far enough forward that the controller has time to response to sharp turns but not so far in the future that the curvefit will have to content with very complex geometry and potentially ugly overfitted solutions. Also, the computational limits need to be considered. For a given `N*dt`, a combination of increasing N / lowering dt will tend to require more computational effort. 
 
-The final values that I chose were N=8 and dt=0.1. These values worked for a velocity of 80 mph. For 60 mph, I used N=10 and dt=0.1. These values seemed to provide enough down track information that the car could achieve the turn rates necessary for sharp turns, but without excessive computations. 
+The final values that I chose were N=8 and dt=0.1. These values worked for a velocity of 90 mph. For 60 mph, I used N=10 and dt=0.1. These values seemed to provide enough down track information that the car could achieve the turn rates necessary for sharp turns, but without excessive computations. 
 
 The cost function required tuning for each velocity target as well. 
 
@@ -86,6 +86,12 @@ The velocity is then used to propagate the current state forward 0.1 s.
 `v = v + accel*latency`
  
 The model was initially tuned with zero latency. Then the latency was changed to 100 ms, and the controller was retuned. The only parameters that needed to be adjusted  were the cost function weights. 
+
+### Simulation Screenshot
+The screen capture below shows the MPC controller output in green, compared to the desired path in the yellow. The controller successfully completes the course, keeping the car on the road at high speed (up to 90 mph on straight portions). 
+
+![img1](img1.png "MPC Control Project")
+
 
 ### Simulation
 To run the simulation:
