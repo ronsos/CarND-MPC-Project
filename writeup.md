@@ -49,9 +49,9 @@ The number of points, N, is the total amount of points used in the optimizer.
 
 Thus, the product of these parameters, `N*dt`, represents the total length of the propagation in time, or time horizon. The larger this number, the greater the length of time forward the optimizer is considering. 
 
-The total distance down the track the optimizer will consider is `N*dt*velocity`. The key in tuning the N and dt parameters is to consider far enough forward that the controller has time to response to sharp turns but not so far in the future that the curvefit will have to content with very complex geometry and potentially ugly overfitted solutions.  
+The total distance down the track the optimizer will consider is `N*dt*velocity`. The key in tuning the N and dt parameters is to consider far enough forward that the controller has time to response to sharp turns but not so far in the future that the curvefit will have to content with very complex geometry and potentially ugly overfitted solutions. Also, the computational limits need to be considered. For a given `N*dt`, increasing N or lowering dt will tend to require more computational effort. 
 
-The final values that I chose were N=10 and dt=0.1. These values worked for velocities of 60 mph and 90 mph. This combination seemed to provide enough down track information that the car could achieve the turn rates necessary for sharp turns, but without excessive manuevering on straight portions. 
+The final values that I chose were N=10 and dt=0.1. These values worked for velocities of 60 mph and 90 mph. This combination seemed to provide enough down track information that the car could achieve the turn rates necessary for sharp turns, but without excessive computations. 
 
 The cost function required tuning for each velocity target as well. 
 
